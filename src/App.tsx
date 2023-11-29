@@ -1,35 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react"
+import AmountInput from "./AmountInput";
+import ResultRow from "./ResultRow";
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [amount,setAmount] = useState('100');
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+   <main className="max-w-2xl mx-auto px-4 py-8">
+    <h1 className="uppercase text-6xl text-center font-bold bg-gradient-to-br from-pink-600 to-sky-400 bg-clip-text text-transparent from-20%">Find cheapest BTC</h1>
+    <div className="flex justify-center mt-6">
+      <AmountInput value={amount} 
+                   onChange={e => setAmount(e.target.value)} />
+    </div>
+    <div className="mt-6">
+      <ResultRow />
+      <ResultRow />
+      <ResultRow />
+      <ResultRow />
+
+    </div>
+   </main>
+  );
 }
 
 export default App
