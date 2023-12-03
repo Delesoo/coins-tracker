@@ -1,10 +1,25 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import AmountInput from "./AmountInput";
 import ResultRow from "./ResultRow";
+import axios from "axios";
+
+type CachedResult = {
+  provider: string;
+  btc: string;
+}
 
 function App() {
 
   const [amount,setAmount] = useState('100');
+  const [cachedResults,setCachedResults] = useState<CachedResult[]>([]);
+  const [loading,setLoading] = useState(true);
+  useEffect(() => {
+    axios.get('https://fyr3sux77q.us.aircode.run/cachedValues')
+      .then(res => {
+        setCachedResults(res.data);
+        setLoading(false);
+    });
+  }, []);
 
   return (
    <main className="max-w-2xl mx-auto px-4 py-8">
@@ -14,11 +29,19 @@ function App() {
                    onChange={e => setAmount(e.target.value)} />
     </div>
     <div className="mt-6">
-      <ResultRow />
-      <ResultRow />
-      <ResultRow />
-      <ResultRow />
-
+      {loading && (
+        <>
+      <ResultRow loading={true} />
+      <ResultRow loading={true} />
+      <ResultRow loading={true} />
+      <ResultRow loading={true} />
+        </>
+      )}
+      {!loading && cachedResults.map(result => (
+        <ResultRow providerName={result.provider} 
+        btc={result.btc}
+        />
+      ))}
     </div>
    </main>
   );
