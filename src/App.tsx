@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import AmountInput from "./AmountInput";
 import ResultRow from "./ResultRow";
 import axios from "axios";
+import {sortBy} from 'lodash';
 
 type CachedResult = {
   provider: string;
@@ -21,6 +22,12 @@ function App() {
     });
   }, []);
 
+  useEffect(() => {
+    console.log('check for '+amount);
+  }, [amount]);
+
+  const sortedCache = sortBy(cachedResults, 'btc').reverse();
+
   return (
    <main className="max-w-2xl mx-auto px-4 py-8">
     <h1 className="uppercase text-6xl text-center font-bold bg-gradient-to-br from-pink-600 to-sky-400 bg-clip-text text-transparent from-20%">Find cheapest BTC</h1>
@@ -37,9 +44,11 @@ function App() {
       <ResultRow loading={true} />
         </>
       )}
-      {!loading && cachedResults.map(result => (
-        <ResultRow providerName={result.provider} 
-        btc={result.btc}
+      {!loading && sortedCache.map((result:CachedResult) => (
+        <ResultRow
+          key={result.provider} 
+          providerName={result.provider} 
+          btc={result.btc}
         />
       ))}
     </div>
