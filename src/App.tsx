@@ -4,16 +4,22 @@ import ResultRow from "./ResultRow";
 import axios from "axios";
 import {sortBy} from 'lodash';
 import  useDebouncedEffect  from  'use-debounced-effect';
+import LoadingSkeleton from "./LoadingSkeleton";
 
 type CachedResult = {
   provider: string;
   btc: string;
 };
 
+type OfferResults = {[key: string]:string};
+
+const defaultAmount = '100';
+
 function App() {
-  const [prevAmount,setPrevAmount] = useState('100');
-  const [amount,setAmount] = useState('100');
+  const [prevAmount,setPrevAmount] = useState(defaultAmount);
+  const [amount,setAmount] = useState(defaultAmount);
   const [cachedResults,setCachedResults] = useState<CachedResult[]>([]);
+  const [offerResults,setOfferResults] = useState<OfferResults>({});
   const [loading,setLoading] = useState(true);
   useEffect(() => {
     axios.get('https://fyr3sux77q.us.aircode.run/cachedValues')
@@ -24,31 +30,50 @@ function App() {
   }, []);
 
   useDebouncedEffect(() => {
+    if(amount === defaultAmount) {
+      return;
+    }
     if(amount !== prevAmount) {
-      console.log('check for '+amount);
+      setLoading(true);
+      axios.get(`https://fyr3sux77q.us.aircode.run/offers?amount=${amount}`)
+      .then(res => {
+        setLoading(false);
+        setOfferResults(res.data);
+        setPrevAmount(amount);
+      });
     }
   }, 300, [amount]);
 
-  const sortedCache = sortBy(cachedResults, 'btc').reverse();
+  const sortedCache:CachedResult[] = sortBy(cachedResults, 'btc').reverse();
+  const sortedResults:CachedResult[] = sortBy(Object.keys(offerResults).map(provider => ({
+      provider,
+      btc:offerResults[provider]
+  })), 'btc').reverse();
+
+  const showCached = amount === defaultAmount;
+
+  const rows = showCached ? sortedCache : sortedResults;
 
   return (
    <main className="max-w-2xl mx-auto px-4 py-8">
     <h1 className="uppercase text-6xl text-center font-bold bg-gradient-to-br from-pink-600 to-sky-400 bg-clip-text text-transparent from-20%">Find cheapest BTC</h1>
-
     <div className="flex justify-center mt-6">
-      <AmountInput value={amount} 
-                   onChange={e => setAmount(e.target.value)} />
+      <AmountInput 
+        value={amount} 
+        onChange={e => setAmount(e.target.value)} />
     </div>
     <div className="mt-6">
       {loading && (
-        <>
-      <ResultRow loading={true} />
-      <ResultRow loading={true} />
-      <ResultRow loading={true} />
-      <ResultRow loading={true} />
-        </>
+        <LoadingSkeleton />
       )}
-      {!loading && sortedCache.map((result:CachedResult) => (
+      {!loading && rows.map(result => (
+        <ResultRow
+          key={result.provider} 
+          providerName={result.provider} 
+          btc={result.btc}
+        />
+      ))}
+      {!loading && !showCached && sortedResults.map(result => (
         <ResultRow
           key={result.provider} 
           providerName={result.provider} 

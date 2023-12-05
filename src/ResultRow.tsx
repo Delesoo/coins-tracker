@@ -12,14 +12,17 @@ type Logo = {
 };
 const logos:{[keys:string]:Logo} = {
     paybis: {source:paybisLogo,invert: true},
-    guardian: {source:'https://guardarian.com/main-logo.svg'},
+    guardarian: {source:'https://guardarian.com/main-logo.svg'},
     moonpay: {source:'https://www.moonpay.com/assets/logo-full-white.svg'},
     transak: {source:'https://assets.transak.com/images/website/transak-logo.svg',},
 };
 
 export default function ResultRow({loading, providerName, btc}:ResultRowProps) {
     return (
-        <div className=" relative border min-h-[64px] border-white/20 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-4 my-2 overflow-hidden">
+        <a 
+            href={`https://${providerName}.com`}
+            target='_blank'
+            className="block relative border min-h-[64px] border-white/20 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-4 my-2 overflow-hidden">
             <div className="flex gap-4">
                 {providerName && (
                     <div className='grow items-center flex'>
@@ -39,8 +42,8 @@ export default function ResultRow({loading, providerName, btc}:ResultRowProps) {
                 )}
             </div>
             {loading && (
-                <div className='inset-0 absolute bg-gradient-to-r from-transparent via-pink-900/50 to-transparent skeleton-animation'></div>
+                <div className='inset-0 absolute bg-gradient-to-r from-transparent via-pink-900/50 to-transparent skeleton-animation border-t border-white/25'></div>
             )}
-        </div>
+        </a>
     );
 }
